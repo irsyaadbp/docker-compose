@@ -26,24 +26,42 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            # Pindah ke direktori utama deploy
-            cd /deploy
-            # Cek apakah folder service sudah ada, jika tidak maka buat folder tersebut
-            if [ ! -d "${{ github.event.inputs.service }}" ]; then
-              echo "Folder /deploy/${{ github.event.inputs.service }} tidak ditemukan. Membuat folder..."
-              echo "Clone repository"
-              git clone https://github.com/irsyaadbp/docker-compose.git .
-            else
-              cd "${{ github.event.inputs.service }}"
-              # Jika sudah merupakan git repository, lakukan git pull
-              if [ -d ".git" ]; then
-                echo "Repository ditemukan, melakukan git pull..."
-                git pull origin main
-              else
-                echo "Folder sudah ada tetapi belum terinisialisasi sebagai repository git."
-                # Opsional: Inisialisasi git atau lakukan tindakan lain sesuai kebutuhan
-              fi
+            #!/bin/bash
+
+            # Pindah ke direktori utama deploy, jika belum ada buat terlebih dahulu
+            if [ ! -d "/deploy" ]; then
+              echo "Membuat folder /deploy..."
+              mkdir -p /deploy
             fi
+            cd /deploy
+
+            # Cek apakah folder docker-compose sudah ada, jika tidak maka clone repo
+            if [ ! -d "docker-compose" ]; then
+              echo "Repository tidak ditemukan, melakukan clone..."
+              git clone https://github.com/irsyaadbp/docker-compose.git docker-compose
+            fi
+
+            # Masuk ke dalam folder docker-compose
+            cd docker-compose
+
+            # Pastikan repository sudah menjadi Git repo sebelum git pull
+            if [ -d ".git" ]; then
+              echo "Melakukan git pull untuk mendapatkan update terbaru..."
+              git pull origin main
+            else
+              echo "Folder docker-compose ada tetapi bukan repository git. Periksa manual."
+              exit 1
+            fi
+
+            # Cek apakah folder service sudah ada, jika belum, lakukan pull ulang
+            if [ ! -d "${{ github.event.inputs.service }}" ]; then
+              echo "Service '${{ github.event.inputs.service }}' tidak ditemukan, melakukan git pull..."
+              git pull origin main
+            fi
+
+            # Pindah ke direktori service yang akan dijalankan
+            cd "/deploy/docker-compose/${{ github.event.inputs.service }}"
+
             # Jalankan docker-compose untuk service tersebut
-            cd /deploy/${{ github.event.inputs.service }}
+            echo "Menjalankan service '${{ github.event.inputs.service }}' dengan docker-compose..."
             docker-compose up -d
