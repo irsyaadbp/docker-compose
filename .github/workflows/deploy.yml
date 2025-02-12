@@ -33,8 +33,8 @@ jobs:
               echo "Folder /deploy/${{ github.event.inputs.service }} tidak ditemukan. Membuat folder..."
               mkdir -p "${{ github.event.inputs.service }}"
               cd "${{ github.event.inputs.service }}"
-              # Opsional: clone repository jika belum ada, ganti <repository_url> dengan URL yang sesuai
-              git clone <repository_url> .
+              echo "Clone repository"
+              git clone https://github.com/irsyaadbp/docker-compose.git .
             else
               cd "${{ github.event.inputs.service }}"
               # Jika sudah merupakan git repository, lakukan git pull
