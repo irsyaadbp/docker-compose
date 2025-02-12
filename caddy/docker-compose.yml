@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:latest
+    container_name: caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - app_network
+    environment:
+      - CADDY_INGRESS_NETWORK=app_network  # Agar bisa auto-discover container lain
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  app_network:
+    driver: bridge

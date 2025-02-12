@@ -1,0 +1,10 @@
+
+snoorefi.syaad.dev {
+  root * /deploy/snoorefi/frontend
+  file_server
+  try_files {path} /index.html
+}
+
+api-snoorefi.syaad.dev {
+  reverse_proxy backend:4000
+}

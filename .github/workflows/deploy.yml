@@ -10,6 +10,8 @@ on:
         type: choice
         options:
           - traefik
+          - caddy
+          - caddy-restart
 
 jobs:
   deploy:
@@ -27,6 +29,15 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             #!/bin/bash
+
+            SERVICE="${{ github.event.inputs.service }}"
+
+            # Jika SERVICE mengandung '-restart', maka langsung restart Caddy & stop script
+            if [[ "$SERVICE" == *"-restart"* ]]; then
+              echo "Restarting Caddy..."
+              docker restart caddy
+              exit 0
+            fi
 
             # Pindah ke direktori utama deploy, jika belum ada buat terlebih dahulu
             if [ ! -d "/deploy" ]; then
