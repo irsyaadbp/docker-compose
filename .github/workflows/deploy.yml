@@ -31,8 +31,6 @@ jobs:
             # Cek apakah folder service sudah ada, jika tidak maka buat folder tersebut
             if [ ! -d "${{ github.event.inputs.service }}" ]; then
               echo "Folder /deploy/${{ github.event.inputs.service }} tidak ditemukan. Membuat folder..."
-              mkdir -p "${{ github.event.inputs.service }}"
-              cd "${{ github.event.inputs.service }}"
               echo "Clone repository"
               git clone https://github.com/irsyaadbp/docker-compose.git .
             else
@@ -47,4 +45,5 @@ jobs:
               fi
             fi
             # Jalankan docker-compose untuk service tersebut
+            cd /deploy/${{ github.event.inputs.service }}
             docker-compose up -d
