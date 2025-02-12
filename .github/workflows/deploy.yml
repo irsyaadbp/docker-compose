@@ -1,0 +1,50 @@
+name: Deploy Service
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Pilih service yang akan dideploy'
+        required: true
+        default: 'traefik'
+        type: choice
+        options:
+          - traefik
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy selected service to VPS
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Pindah ke direktori utama deploy
+            cd /deploy
+            # Cek apakah folder service sudah ada, jika tidak maka buat folder tersebut
+            if [ ! -d "${{ github.event.inputs.service }}" ]; then
+              echo "Folder /deploy/${{ github.event.inputs.service }} tidak ditemukan. Membuat folder..."
+              mkdir -p "${{ github.event.inputs.service }}"
+              cd "${{ github.event.inputs.service }}"
+              # Opsional: clone repository jika belum ada, ganti <repository_url> dengan URL yang sesuai
+              git clone <repository_url> .
+            else
+              cd "${{ github.event.inputs.service }}"
+              # Jika sudah merupakan git repository, lakukan git pull
+              if [ -d ".git" ]; then
+                echo "Repository ditemukan, melakukan git pull..."
+                git pull origin main
+              else
+                echo "Folder sudah ada tetapi belum terinisialisasi sebagai repository git."
+                # Opsional: Inisialisasi git atau lakukan tindakan lain sesuai kebutuhan
+              fi
+            fi
+            # Jalankan docker-compose untuk service tersebut
+            docker-compose up -d
