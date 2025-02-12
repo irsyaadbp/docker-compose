@@ -1,9 +1,8 @@
-
 snoorefi.syaad.dev {
-  root * /deploy/snoorefi/frontend
+  root * /srv/snoorefi/frontend
   file_server
   try_files {path} /index.html
-  encode gzip
+  encode zstd gzip
 }
 
 api-snoorefi.syaad.dev {
