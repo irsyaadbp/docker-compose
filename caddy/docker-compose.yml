@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   caddy:
@@ -9,9 +9,10 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /deploy/docker-compose/caddy/Caddyfile:/etc/caddy/Caddyfile  # Pastikan ini file, bukan folder
+      - /deploy/docker-compose/caddy/Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
+      - /deploy/snoorefi/frontend:/srv/snoorefi/frontend
     networks:
       - caddy_net
 
