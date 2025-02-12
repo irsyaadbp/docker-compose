@@ -6,5 +6,5 @@ snoorefi.syaad.dev {
 }
 
 api-snoorefi.syaad.dev {
-  reverse_proxy backend:4000
+  reverse_proxy snoorefi-backend:4000
 }
