@@ -8,3 +8,10 @@ snoorefi.syaad.dev {
 api-snoorefi.syaad.dev {
   reverse_proxy snoorefi-backend:4000
 }
+
+promptlab.syaad.dev {
+  root * /srv/promptlab/frontend
+  file_server
+  try_files {path} /index.html
+  encode zstd gzip
+}

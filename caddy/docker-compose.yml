@@ -13,6 +13,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - /deploy/snoorefi/frontend:/srv/snoorefi/frontend
+      - /deploy/promptlab/frontend:/srv/promptlab/frontend
     networks:
       - caddy_net
 
