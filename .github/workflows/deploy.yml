@@ -75,4 +75,5 @@ jobs:
 
             # Jalankan docker-compose untuk service tersebut
             echo "Menjalankan service '${{ github.event.inputs.service }}' dengan docker-compose..."
+            docker-compose down
             docker-compose up -d
