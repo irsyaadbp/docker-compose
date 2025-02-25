@@ -6,7 +6,7 @@ on:
       service:
         description: 'Pilih service yang akan dideploy'
         required: true
-        default: 'traefik'
+        default: 'caddy'
         type: choice
         options:
           - caddy
@@ -71,16 +71,26 @@ jobs:
               git pull origin main
             fi
 
+            # Pindah ke direktori service yang akan dijalankan
+            cd "/deploy/docker-compose/${{ github.event.inputs.service }}"
+
             if [[ "$SERVICE" == "postgresql" ]]; then
+              echo "Set env postgre."
+              # Jika file .env sudah ada, hapus dulu
+              if [[ -f .env ]]; then
+                rm .env
+              fi
+              # Buat file .env baru dengan value dari GitHub Secrets
               echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
               echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
               echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
             fi
 
-            # Pindah ke direktori service yang akan dijalankan
-            cd "/deploy/docker-compose/${{ github.event.inputs.service }}"
-
             # Jalankan docker-compose untuk service tersebut
             echo "Menjalankan service '${{ github.event.inputs.service }}' dengan docker-compose..."
             docker-compose down
-            docker-compose up -d
+            if [[ "$SERVICE" == "postgresql" ]]; then
+              docker-compose --env-file .env up -d
+            else
+              docker-compose up -d
+            fi
